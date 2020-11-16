@@ -6,7 +6,7 @@ const names = document.querySelectorAll('p.fname');
 const repoCount = document.querySelectorAll('span.repo-count');
 const bio = document.querySelectorAll('p.my-bio');
 const loader = document.querySelector('section.loader');
-import {config} from './config.js'
+import {config} from 'config.js'
 const accessKey=config().accessKey;
 function format(element, value) {
 	element.textContent = value;
