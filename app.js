@@ -66,15 +66,32 @@ function getMonth(date) {
 function dateFilter(date) {
 	// to format Update date of the repo
 	const updateDate = new Date(date);
-	const presentDate = Date.now();
+     const presentDate = Date.now();
+     const secDifference=(presentDate - updateDate) / (1000);
+     const minDifference=(presentDate - updateDate) / (1000 * 60 );
+     const hrDifference=(presentDate - updateDate) / (1000 * 60 * 60);
 	const daysDifference = (presentDate - updateDate) / (1000 * 60 * 60 * 24);
-
-	// uses this format if the repo last update is over 28 days
-	if (daysDifference > 28) {
-		return `on ${getMonth(updateDate)} ${updateDate.getDate()}`
-	} else {
-		return `${Math.round(daysDifference)} days ago`
-	}
+     
+     // if last update is less than a minute
+     if(secDifference<60){
+          return `${Math.round(secDifference)} seconds ago`
+     }
+     // if last update is less than an hour
+     else if(minDifference<60){
+          return `${Math.round(minDifference)} minutess ago`
+     }
+     // if last update is less than a day
+     else if(hrDifference<24){
+          return `${Math.round(hrDifference)} hours ago`
+     }
+     // if last update is less than a month
+     else if(daysDifference<28){
+          return `${Math.round(daysDifference)} days ago`
+     }
+     // if last update is over a month
+     else{
+          return `on ${getMonth(updateDate)} ${updateDate.getDate()}`
+     }
 }
 
 function createRepoDetails(repo) {
@@ -87,10 +104,10 @@ function createRepoDetails(repo) {
 	let description = "";
 	//checks if the repo was forked
 	if (repo.parent) {
-		forked = `<p class="forked">Forked from <a href="">${repo.parent.nameWithOwner}</a></p>`
+		forked = `<p class="forked">Forked from <a href="https://github.com/${repo.parent.nameWithOwner}">${repo.parent.nameWithOwner}</a></p>`
 		forks = ` 
           <div>
-               <a href="" class="fork-link">
+               <a href="https://github.com/readwarn/${repo.name}/network/members" class="fork-link">
                <svg aria-label="fork" class="" viewBox="0 0 16 16" version="1.1" width="16" height="16" role="img"><path fill-rule="evenodd" d="M5 3.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v.878A2.25 2.25 0 005.75 8.5h1.5v2.128a2.251 2.251 0 101.5 0V8.5h1.5a2.25 2.25 0 002.25-2.25v-.878a2.25 2.25 0 10-1.5 0v.878a.75.75 0 01-.75.75h-4.5A.75.75 0 015 6.25v-.878zm3.75 7.378a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm3-8.75a.75.75 0 100-1.5.75.75 0 000 1.5z"></path></svg>
                ${repo.parent.forkCount}
                </a>
@@ -110,7 +127,7 @@ function createRepoDetails(repo) {
 	}
 	temp.innerHTML = `
      <div class="repo-body">
-          <a href="" class="r-link">${repo.name}</a>
+          <a href="https://github.com/readwarn/${repo.name}" class="r-link">${repo.name}</a>
           ${forked}
           ${description}
           <div class="repo-tags">
@@ -133,7 +150,7 @@ function createRepoDetails(repo) {
 	sectionRight.appendChild(temp);
 }
 
-//renders the repo container after the data i fetched
+//renders the repo container after the data is fetched
 function renderRepos(repos) {
 	repos.forEach(repo => {
 		createRepoDetails(repo)
@@ -147,7 +164,7 @@ const query = `query {
       twitterUsername
       login
       bio
-       repositories(first:7,orderBy:{field:PUSHED_AT,direction:DESC}){
+       repositories(first:20,orderBy:{field:PUSHED_AT,direction:DESC}){
           totalCount  
           nodes{
             name
@@ -169,12 +186,13 @@ const query = `query {
     }
   }`
 
-fetch('https://api.github.com/graphql', {
+fetch('https://api.github.com/graphql', 
+         {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 			'Accept': 'application/json',
-			'Authorization': 'Bearer 1fb17a39b5929d7ed0a0805807da0dc631b7e496',
+			'Authorization': 'Bearer 2c5e7e77a766c33d90a1bdfb0949631864c7055d',
 		},
 		body: JSON.stringify({
 			query
@@ -184,7 +202,7 @@ fetch('https://api.github.com/graphql', {
 	.then(value => {
 		const user = value.data.user;
 		const repos = user.repositories.nodes;
-		format(handle, user.twitterUsername);
+		format(handle, `@${user.twitterUsername}`);
 		formatAll(username, user.login);
 		formatAll(names, user.name);
 		formatAll(bio, user.bio);

@@ -335,7 +335,8 @@ p.info {
 	font-size: 0.8rem;
 	line-height: 1.5;
 	width: 65%;
-	font-weight: 400;
+    font-weight: 400;
+    margin-top: 0.35rem;
 }
 
 a.r-link {
@@ -353,6 +354,9 @@ p.forked {
 	font-weight: 300;
 	color: #807f7f;
 	margin: 0.35rem 0rem;
+}
+p.forked a:hover{
+    color: #0366d6;
 }
 
 div.repo-tags {
